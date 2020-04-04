@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int main()
+{
+    int v, h; //These are the array variables which will be used to place the encryted message into. v stands for vertical, h stands for horizontal.
+    int length = 26, rails = 3; //Length is the variable in which the length of the entered string is recorded. Rails are the number of rails the encryption process wil use.
+    int count; //This variable will be used to determine which way the rail should trace, either diagonally down or up.
+    int encrypMessage[100][1000]; //The new location of each character in the string will be stored in this array. This array will use [v] and [h].
+    char string[] = "Lets Assasin King at night"; //This will be the array in which the initail message will be stored. A limit of 1000 characters has been placed.
+    char *strings = &string[0]; //This is a pointer to the initial message
+    printf("%s\n", strings);
+
+    for(v = 0; v < rails; v++) //this will cycle through our encryMessage array and set all the inital values to 0.
+    {
+       for(h = 0; h < length; h++) //this will cycle through our encryMessage array and set all the inital values to 0.
+       {
+            encrypMessage[v][h] = 0; //Setting all values of this array to 0 so that we can enter our own values from the string[].
+       }
+    }
+    count = 0; //Set to zero, then will be incremented after every interation.
+    h = 0; //Set to zero so that we are getting the initial value of the array.
+
+    while (h < length) //This will only run while the variable h is one less that the length of the string.
+    {
+       if (count%2 == 0) //If count is either 0 or an even number this "if" statement will execute
+       {
+            for(v = 0; v < rails; v++) //Increment the vertical variable until it is 1 less than the number of rails.
+            {
+                encrypMessage[v][h] = (int)strings[h]; //copy values from string into our encryted message.
+                h++; //increment the horizontal value so that the next letter gets placed in the appropriate spot.
+            }
+       }
+       else //If count is not 0 or even, this portion of the code will execute.
+       {
+           for(v = rails-2; v > 0; v--) //
+           {
+               encrypMessage[v][h] = (int)strings[h];
+               h++;
+           }
+       }
+    count++;
+    }
+    for(v = 0; v < rails; v++)
+    {
+        for(h = 0; h < length; h++)
+        {
+            if(encrypMessage[v][h] != 0)
+            printf("%c", encrypMessage[v][h]);
+        }
+    }
+}
