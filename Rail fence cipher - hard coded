@@ -58,3 +58,5 @@ int main()
                 fscanf(input, "%s", string);
                 printf("%s ", string);
             }
+fgets(strings, 1000, input); // read from file
+            puts(strings); // print read content out to stdout
