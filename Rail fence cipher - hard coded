@@ -51,3 +51,10 @@ int main()
         }
     }
 }
+
+
+  int i;
+            for (i = 0; i < 9; i++) {
+                fscanf(input, "%s", string);
+                printf("%s ", string);
+            }
