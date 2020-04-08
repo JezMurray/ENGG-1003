@@ -2,61 +2,144 @@
 #include <stdlib.h>
 #include <string.h>
 
+void railFence(char *message, char *cipherText, int length, int A); //This is the standard rail-fence cipher function prototype.
+
+void railFence2(char *message, char *cipherText, int length, int A, int B, int dir);  // This is the 2-level rail-fence cipher function prototype.
+
+
 int main()
 {
-    int v, h; //These are the array variables which will be used to place the encryted message into. v stands for vertical, h stands for horizontal.
-    int length = 26, rails = 3; //Length is the variable in which the length of the entered string is recorded. Rails are the number of rails the encryption process wil use.
-    int count; //This variable will be used to determine which way the rail should trace, either diagonally down or up.
-    int encrypMessage[100][1000]; //The new location of each character in the string will be stored in this array. This array will use [v] and [h].
-    char string[] = "Lets Assasin King at night"; //This will be the array in which the initail message will be stored. A limit of 1000 characters has been placed.
-    char *strings = &string[0]; //This is a pointer to the initial message
-    printf("%s\n", strings);
+    int r= 0, c= 0, y = 0, i = 0, rails1= 0, length1= 0, dir=0, A=0, B=0;
 
-    for(v = 0; v < rails; v++) //this will cycle through our encryMessage array and set all the inital values to 0.
-    {
-       for(h = 0; h < length; h++) //this will cycle through our encryMessage array and set all the inital values to 0.
-       {
-            encrypMessage[v][h] = 0; //Setting all values of this array to 0 so that we can enter our own values from the string[].
-       }
-    }
-    count = 0; //Set to zero, then will be incremented after every interation.
-    h = 0; //Set to zero so that we are getting the initial value of the array.
+    FILE *input;
+    input = fopen("message.txt", "r");
 
-    while (h < length) //This will only run while the variable h is one less that the length of the string.
+    if(input == NULL)
     {
-       if (count%2 == 0) //If count is either 0 or an even number this "if" statement will execute
-       {
-            for(v = 0; v < rails; v++) //Increment the vertical variable until it is 1 less than the number of rails.
-            {
-                encrypMessage[v][h] = (int)strings[h]; //copy values from string into our encryted message.
-                h++; //increment the horizontal value so that the next letter gets placed in the appropriate spot.
-            }
-       }
-       else //If count is not 0 or even, this portion of the code will execute.
-       {
-           for(v = rails-2; v > 0; v--) //
-           {
-               encrypMessage[v][h] = (int)strings[h];
-               h++;
-           }
-       }
-    count++;
+        perror("fopen()");
+        return 1;
     }
-    for(v = 0; v < rails; v++)
+    char x;
+    char str[1000];
+    fscanf(input, "%c", &x);
+    while(!feof(input) && i < 999) //Determines whether or not the program has scanned through the entire file using the !feof function.
     {
-        for(h = 0; h < length; h++)
+        str[i++] = x;
+        fscanf(input, "%c", &x);
+    }
+    str[i] = 0;
+    char cipherText[1000];
+
+    printf("Cipher Selection: Choose from the following options\n");
+    printf("1. Encryption of a message using the classical rail-fence cipher algorithm\n");
+    printf("2. Encryption/Decryption of a message using the 2-level rail-fence cipher\n");
+    scanf("%d", &y);
+    switch (y)
+    {
+    case 1:
+        printf("\nEnter message to be encrypted:\n\n");
+        printf("%s\n", str);
+        char *string = &str[0];
+        printf("Enter key:\n\n");
+        scanf("%d", &rails1);
+        length1 = strlen(str);
+        printf("\nEncrypted message is:\n\n");
+        railFence(string, &cipherText, length1, rails1);
+        break;
+
+    case 2:
+        printf("\nEnter message to be encrypted:\n\n");
+        printf("%s\n", str);
+        printf("Enter A value and B value\n");
+        scanf("%d %d", &A, &B);
+        printf("If you want to Encrypt please enter 1\nIf you want to Decrypt please enter 2\n");
+        scanf("%d", &dir);
+        length1 = strlen(str);
+        printf("\nEncrypted message is:\n\n");
+        railFence2(&str, &cipherText, length1, A, B, dir);
+        break;
+    }
+}
+void railFence(char *message, char *cipherText, int length, int A)
+{
+    int r, c;
+    char encryptedMessage[100][1000];
+    for(r = 0; r < A; r++)
+    {
+        for(c = 0; c < length; c++)
         {
-            if(encrypMessage[v][h] != 0)
-            printf("%c", encrypMessage[v][h]);
+            encryptedMessage[r][c] = 0;
+        }
+    }
+    c = 0;
+    while (c < length)
+    {
+        for(r = 0; r < A; ++r)
+        {
+            encryptedMessage[r][c] = (int)message[c];
+            c++;
+        }
+        for(r = A - 2; r > 0; --r)
+        {
+            encryptedMessage[r][c] = (int)message[c];
+            c++;
+        }
+    }
+    for(r = 0; r < A; r++)
+    {
+        for(c = 0; c < length; c++)
+        {
+            if (encryptedMessage[r][c] != '\n')
+                printf("%c", encryptedMessage[r][c]);
         }
     }
 }
 
-
-  int i;
-            for (i = 0; i < 9; i++) {
-                fscanf(input, "%s", string);
-                printf("%s ", string);
+void railFence2(char *message, char *cipherText, int length, int A, int B, int dir)
+{
+    while(dir == 1)
+    {
+        int v, h;
+        char encryptedMessage2[100][1000];
+        for(v = 0; v < A; v++)
+        {
+            for(h = 0; h < length; h++)
+            {
+                encryptedMessage2[v][h] = 0;
             }
-fgets(strings, 1000, input); // read from file
-            puts(strings); // print read content out to stdout
+        }
+        h = 0;
+        while(h < length)
+        {
+            for(v = 0; v < A; ++v)
+            {
+                encryptedMessage2[v][h] = (int)message[h];
+                h++;
+            }
+            for(v = A - 2; v == B-1; --v)
+            {
+                encryptedMessage2[v][h] = (int)message[h];
+                h++;
+            }
+            for(v = B; v < A; ++v)
+            {
+                encryptedMessage2[v][h] = (int)message[h];
+                h++;
+            }
+            for(v = A - 2; v > 0; --v)
+            {
+                encryptedMessage2[v][h] = (int)message[h];
+                h++;
+            }
+        }
+        for(v = 0; v < A; v++)
+        {
+            for(h = 0; h < length; h++)
+            {
+                if (encryptedMessage2[v][h] != '\n')
+                    printf("%c", encryptedMessage2[v][h]);
+            }
+        }
+        return 0;
+    }
+}
