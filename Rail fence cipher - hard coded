@@ -2,144 +2,243 @@
 #include <stdlib.h>
 #include <string.h>
 
-void railFence(char *message, char *cipherText, int length, int A); //This is the standard rail-fence cipher function prototype.
+void railFence(char *message, char *cipherText, int length, int A);  // This is the standard rail-fence cipher function prototype.
 
 void railFence2(char *message, char *cipherText, int length, int A, int B, int dir);  // This is the 2-level rail-fence cipher function prototype.
 
 
 int main()
 {
-    int r= 0, c= 0, y = 0, i = 0, rails1= 0, length1= 0, dir=0, A=0, B=0;
+    int y = 0;  // This will be used in the switch case. The user will be able to chose which cipher they will use based off of what value they set the y variable to.
+    int i = 0;  // Loop variable, will be used to scan through input file.
+    int rails1 = 0; // Will be used as the key for the railFence() function, this value determines how many rails will be created.
+    int length1= 0; // Will be used to store the string length of the original messsage, this value determines how many collumns will be created.
+    int dir = 0;    // This variable allows the user to chose between encrytion or decryption when using the railFence2() function.
+    int A=0, B=0;   // These variables will be used for the railFence2(), they are the keys which detrmine how the encryption and decryption process occurs.
+    int check;  // Used to ensure that the user is entering integers when required.
 
-    FILE *input;
-    input = fopen("message.txt", "r");
+    FILE *input; // Declaring a pointer of type file. Naming the variable input. Format to do this is - FILE *fptr;
+    input = fopen("message.txt", "r"); // Opening the file "message.txt" for reading using "r".
 
-    if(input == NULL)
+    if(input == NULL) // If there is no file assigned to the file pointer "input" this "if" statement will execute.
     {
-        perror("fopen()");
-        return 1;
+        perror("fopen()"); // An error will be printed to the screen if there is no file which matches that is listed in the fopen() function.
+        return; // This will exit the program.
     }
-    char x;
-    char str[1000];
-    fscanf(input, "%c", &x);
-    while(!feof(input) && i < 999) //Determines whether or not the program has scanned through the entire file using the !feof function.
+    char x; // The characters in the file will be placed into this variable.
+    char str[1000]; // Creating an array for the original message. This has a size of 1000 characters.
+    fscanf(input, "%c", &x); // Obtaining the first character of the input file and storing it into the variable "x".
+    while(!feof(input) && i < 999) //Determines whether or not the program has scanned through the entire file using the !feof function. This while loop will increment until these parameters are met.
     {
-        str[i++] = x;
-        fscanf(input, "%c", &x);
+        str[i++] = x; // Incrementing i so that each character in the file is sotred into the array str[].
+        fscanf(input, "%c", &x); // Scanning through each character and storing value into the variable "x".
     }
-    str[i] = 0;
-    char cipherText[1000];
+    str[i] = 0; // Re-intitialising the array str[i] to equal zero.
+    char cipherText[1000];  // Creating an array for the encrypted text. Limit of 1000 characters.
 
-    printf("Cipher Selection: Choose from the following options\n");
-    printf("1. Encryption of a message using the classical rail-fence cipher algorithm\n");
-    printf("2. Encryption/Decryption of a message using the 2-level rail-fence cipher\n");
-    scanf("%d", &y);
-    switch (y)
+    printf("Cipher Selection: Choose from the following options\n");    // Start of the menu. Prompts user to select from the two options listed.
+    printf("1. Encryption of a message using the classical rail-fence cipher algorithm\n"); // This informs the user of what option 1 does.
+    printf("2. Encryption/Decryption of a message using the 2-level rail-fence cipher\n");  // This informs the user of what option 2 does.
+    scanf("%d", &y);    // Scans the integer value entered by the user and stores it in variable "y".
+    if((y != 1) && (y != 2))    // If the user does not enter either 1 or 2, and error message will be printed.
     {
-    case 1:
-        printf("\nEnter message to be encrypted:\n\n");
-        printf("%s\n", str);
-        char *string = &str[0];
-        printf("Enter key:\n\n");
-        scanf("%d", &rails1);
-        length1 = strlen(str);
-        printf("\nEncrypted message is:\n\n");
-        railFence(string, &cipherText, length1, rails1);
-        break;
+        printf("Please enter 1 or 2."); // Prints message to the screen, informing user to enter either 1 or 2.
+        return 0;   // Quits program.
+    }
+    switch (y)  // Creating a switch case, using the value of "y" to determine which case will  be selected.
+    {
+    case 1: // Case 1 will execute if the user enters the number 1.
+        printf("\nEnter message to be encrypted:\n\n"); // Prints message to the screen, asking for the message they want to encrypt.
+        printf("%s\n", str);    // Prints the string stored in the str array to the screen.
+        char *string = &str[0]; // Creating a pointer to the array str[], this pointer will be used as an argument for the railFence() function.
+        printf("Enter key:\n\n");   // Asking the user to enter an integer which will be the key for the railFence() function.
+        check = scanf("%d", &rails1);   // Scanning user input and storing the integer value into the variable "rails1". "check" will count how many integers were entered.
+        if((check != 1)|| (rails1 < 2)) // If no integer was entered this for loop wil execute, or if the value entered was less than 2 this for loop will execute.
+        {
+            printf("Please enter a postive integer greater than 1. \n");    // Prints message to the screen, asking user to enter an integer greater than 1.
+            return 0;   // Ends program.
+        }
+        length1 = strlen(str);  // Using the function strlen() to get the length of the messasge in the array str[]. Assigning this integer value to the variable "length1".
+        printf("\nThe visual matrix is:\n\n");  // When the railFence() function is being executed, it will print a visual 2d array. This line of text explains what is being printed.
+        railFence(string, &cipherText, length1, rails1);    // Calling the railFence() function using the variables that have been named and assigned values.
+        break;  // Once the railFence() function has finished executing "case 1" will break, causing the program to exit.
 
-    case 2:
-        printf("\nEnter message to be encrypted:\n\n");
-        printf("%s\n", str);
-        printf("Enter A value and B value\n");
-        scanf("%d %d", &A, &B);
-        printf("If you want to Encrypt please enter 1\nIf you want to Decrypt please enter 2\n");
-        scanf("%d", &dir);
-        length1 = strlen(str);
-        printf("\nEncrypted message is:\n\n");
-        railFence2(&str, &cipherText, length1, A, B, dir);
-        break;
+    case 2: // Case 2 will execute if the user enters the number 2.
+        printf("\nEnter message to be encrypted:\n\n"); // Prints message to the screen, asking for the message they want to encrypt.
+        printf("%s\n", str);    // Prints the string stored in the str array to the screen.
+        printf("Enter A value and B value (A and B must be positive integers, A must be greater than B) :\n");  // Prompts user to enter two integers, also lists the requirements that these integers must meet.
+        check = scanf("%d %d", &A, &B); // Scanning user input and assigning the values to the variables "A" and "B". "check" will count how many integers were entered.
+        if(check != 2)  // If the user did not enter two integers, this "if" statement will execute.
+        {
+            printf("Please enter two positive integers.\n");    // Asks user to enter two positivve integers.
+            return 0;   // Ends program.
+        }
+        if((A < 2) || (B < 1))  // If the "A" value is less than 2, or the "B" value is less than 1 this "if" statement will execute.
+        {
+            printf("A must be greater than 1, B must be greater than 0.\n");    // Informs user of the requirements that the "A" and "B" values must meet.
+            return 0;   // Ends program.
+        }
+        if(A < B)   // If the "A" value is less than the "B" value, this "if" statement will execute.
+        {
+            printf("A must be greater than B. \n"); // Informs user of the requirements that the "A" and "B" values must meet.
+            return 0;   // Ends program.
+        }
+        printf("If you want to Encrypt please enter 1\nIf you want to Decrypt please enter 2\n");   // Gives the user the option to encrypt or decrypt.
+        scanf("%d", &dir);  // Scans user input and stores it in the "dir" variable.
+        length1 = strlen(str);  // Using the function strlen() to get the length of the messasge in the array str[]. Assigning this integer value to the variable "length1".
+        printf("\nThe visual matrix is:\n\n");  // When the railFence() function is being executed, it will print a visual 2d array. This line of text explains what is being printed.
+        railFence2(&str, &cipherText, length1, A, B, dir);  // Calling the railFence2() function using the variables that have been named and assigned values.
+        break;  // Once the railFence2() function has finished executing "case 2" will break, causing the program to exit.
     }
 }
+
+// Bellow is the rail-fence cipher function definition.
+// It accepts 4 arguments;
+// A pointer to an array of the original message (*message),
+// A pointer to the array of the cipher text (cipherText),
+// The length of the original message (length),
+// Finally the key, which determines the number of rils (A).
+
+// The return value is "void", however inside the function the encrypted message is printed. The function can not be used as an R-value (right side value).
+
+// The "railFence()" function has one purpose, to encrypt a message using the classical rail-fence cipher.
+// The encryption process is performed by creating a 2d array in which the characters of the original message will me placed.
+// The number of rails (rows), will be determined by the value of "A".
+// The characters are placed into the matrix starting from the top rail, progressing until it reaches the bottom rail.
+// From there the characters go back up to the top, in a zig-zag pattern.
+// Once the last character from the orignal message has been placed into the 2d array the process will finish.
+// The function knows when to stop looping based off of the variable "length".
+// If there are 50 characters in the message, there will be 50 collumns created in the 2d array.
+
+// Limitations:
+// The message length must be less than 1000 characters.
+// "A" must be greater than 1.
+// The number of rails cannot be greater than the length of the message.
 void railFence(char *message, char *cipherText, int length, int A)
 {
-    int r, c;
-    char encryptedMessage[100][1000];
-    for(r = 0; r < A; r++)
+    int r = 0, c = 0;   // These will be used as loop variables. "r" is shorts for rows, "c" is short for collumns.
+    char encryptedMessage[999][1000];   // Creating the 2d array in which the encrypted message will be stored. Max ammount of rows = 999, max ammount of collumns = 1000.
+    for(r = 0; r < A; r++)  // Looping through "r" while it is less than "A". Remember that array indexes start at arr[0], not arr[1].
     {
-        for(c = 0; c < length; c++)
+        for(c = 0; c < length; c++) // Looping through "c" while it is less than "length".
         {
-            encryptedMessage[r][c] = 0;
+            encryptedMessage[r][c] = '-';   // Making every position in the array an "-" so that the user can see the visual representation of the rails.
         }
     }
-    c = 0;
-    while (c < length)
+    c = 0;  // Re-initialising "c" to zero so that every position is looped through.
+    while (c < length)  // Loop will execute until "c" is one less than the length of the messsage. Ensuring that there is a collumn avaible for every character in the original message to be placed into.
     {
-        for(r = 0; r < A; ++r)
+        for(r = 0; r < A; ++r)  // This loop will start at the top rail and go down until it reaches the final rail which is determined by the "A" value.
         {
-            encryptedMessage[r][c] = (int)message[c];
-            c++;
+            encryptedMessage[r][c] = (int)message[c];   // Placing the character which is stored at the corresponding "c" position in the original message, into the 2D array.
+            c++;    // Incrementing "c" so that the while loop continues.
         }
-        for(r = A - 2; r > 0; --r)
+        for(r = A - 2; r > 0; --r)  // Starting at the rail 1 above the bottom, the loop will travel up the rails until it reaches the top.
         {
-            encryptedMessage[r][c] = (int)message[c];
-            c++;
+            encryptedMessage[r][c] = (int)message[c];   // Placing the character which is stored at the corresponding "c" position in the original message, into the 2D array.
+            c++;    // Incrementing "c" so that the while loop continues.
         }
     }
-    for(r = 0; r < A; r++)
+    for(r = 0; r < A; r++)  // Loops through every rail in the array.
     {
-        for(c = 0; c < length; c++)
+        for(c = 0; c < length; c++) // Loops through every collumn in the array.
         {
-            if (encryptedMessage[r][c] != '\n')
-                printf("%c", encryptedMessage[r][c]);
+            if (encryptedMessage[r][c] != 0)    // If the character at each given index does not equal 0,
+                printf("%c ", encryptedMessage[r][c]);  // The character will be printed to the screen. This includes the "-", so that the user can see the visual 2D array.
+        }
+        printf("\n\n"); // Adding new lines to make the printed contents look neat.
+    }
+    printf("Encrypted Message is: \n\n");   // Finally the encryted message will be printed.
+    for(r = 0; r < A; r++)  // Loops through every rail in the array.
+    {
+        for(c = 0; c < length; c++) // Loops through every collumn in the array.
+        {
+            if (encryptedMessage[r][c] != '-' && encryptedMessage[r][c] != '\n')    // Sorting through the array so that no "-" or new lines will be printed, all other characters will be.
+                printf("%c", encryptedMessage[r][c]);   // Printing every other character reading in a top-bottom, left-right format.
         }
     }
+    printf("\n\n"); // Adding new lines to make the printed contents look neat.
 }
+
+// Below is the 2-level rail-fence cipher function definition.
+// It accepts 6 arguments;
+// a pointer to an array of the original message (*message), a pointer to the array of the cipher text (*cipherText),
+// the length of the original message (length), the first key which dictates how many rails there will be (A),
+// the second key which dictates how far up the characters will go from the bottom of the rails (B),
+// and finally a value which will let the user choose to encrypt or decrypt (dir).
+
+// The return value is "void", however inside the function the encrypted message is printed. The function can not be used as an R-value (right side value).
+
+// The function has two purposes, to encrypt a message or to decrypt a message.
+// The encryption process creates a 2d array which is then filled with the characters from the original message.
+// The number of rails (rows) are based off of the A value, which is entered by the user.
+// Once the characters reach the bottom rail they are then placed into the array going back up the rails until they hit the "B" value.
+// From there the characters go back down to bottom rail and finally go back up the rails to the top.
+// This process is repeated until each character in the message has been placed into the array.
+// The function knows when to stop looping based off of the length of the original message,
+// if there are 50 characters in the message, 50 collumns will be created in the matrix.
+
+// Limitations:
+// Strings entered into this function must be less than 1000 characters.
+// "A" must be greater than "B", "A" must be > 2, "B" must be > 1.
+// The number of rails cannot be greater than the length of the message.
 
 void railFence2(char *message, char *cipherText, int length, int A, int B, int dir)
 {
-    while(dir == 1)
+    while(dir == 1) // If the user enters the number 1, the encryption process will commence.
     {
-        int v, h;
-        char encryptedMessage2[100][1000];
-        for(v = 0; v < A; v++)
+        int v = 0, h = 0;   // These will be used as loop variables. "v" is shorts for vertical, "h" is short for horizontal.
+        char encryptedMessage2[999][1000];  // Creating the 2d array in which the encrypted message will be stored. Max ammount of rows = 999, max ammount of collumns = 1000.
+        for(v = 0; v < A; v++)  // Looping through "v" while it is less than "A". Remember that array indexes start at arr[0], not arr[1].
         {
-            for(h = 0; h < length; h++)
+            for(h = 0; h < length; h++) // Looping through "h" while it is less than "length".
             {
-                encryptedMessage2[v][h] = 0;
+                encryptedMessage2[v][h] = '-'; // Making every position in the array an "-" so that the user can see the visual representation of the rails.
             }
         }
-        h = 0;
-        while(h < length)
+        h = 0;  // Re-initialising "h" to zero so that every position is looped through.
+        while(h < length) // Loop will execute until "h" is one less than the length of the messsage. Ensuring that there is a collumn avaible for every character in the original message to be placed into.
         {
-            for(v = 0; v < A; ++v)
+            for(v = 0; v < A; v++)  // This loop will start at the top rail and go down until it reaches the final rail which is determined by the "A" value.
             {
-                encryptedMessage2[v][h] = (int)message[h];
-                h++;
+                encryptedMessage2[v][h] = (int)message[h];  // Placing the character which is stored at the corresponding "h" position in the original message, into the 2D array.
+                h++;    // Incrementing "h" so that the while loop progresses.
             }
-            for(v = A - 2; v == B-1; --v)
+            for(v = A - 2; v > A - B; v--)  // This loop will start at the rail above the bottom and end when it reaches the height of the value of "B".
             {
-                encryptedMessage2[v][h] = (int)message[h];
-                h++;
+                encryptedMessage2[v][h] = (int)message[h];  // Placing the character which is stored at the corresponding "h" position in the original message, into the 2D array.
+                h++;    // Incrementing "h" so that the while loop progresses.
             }
-            for(v = B; v < A; ++v)
+            for(v = A - B; v < A; v++)  // This loop will start at the height of the value of "B" and then go back down to the bottom rail.
             {
-                encryptedMessage2[v][h] = (int)message[h];
-                h++;
+                encryptedMessage2[v][h] = (int)message[h];  // Placing the character which is stored at the corresponding "h" position in the original message, into the 2D array.
+                h++;    // Incrementing "h" so that the while loop progresses.
             }
-            for(v = A - 2; v > 0; --v)
+            for(v = A - 2; v > 0; v--)  // This loop will then go from the bottom all the way back to the top.
             {
-                encryptedMessage2[v][h] = (int)message[h];
-                h++;
+                encryptedMessage2[v][h] = (int)message[h];  // Placing the character which is stored at the corresponding "h" position in the original message, into the 2D array.
+                h++;    // Incrementing "h" so that the while loop progresses.
             }
         }
-        for(v = 0; v < A; v++)
+        for(v = 0; v < A; v++)  // Loops through every rail in the array.
         {
-            for(h = 0; h < length; h++)
+            for(h = 0; h < length; h++) // Loops through every collumn in the array.
             {
-                if (encryptedMessage2[v][h] != '\n')
-                    printf("%c", encryptedMessage2[v][h]);
+                if (encryptedMessage2[v][h] != 0)   // If the character at each given index does not equal 0,
+                    printf("%c ", encryptedMessage2[v][h]); // The character will be printed to the screen. This includes the "-", so that the user can see the visual 2D array.
+            }
+            printf("\n\n"); // Adding new lines to make the printed contents look neat.
+        }
+        printf("Encrypted Message is: \n\n");   // Finally the encryted message will be printed.
+        for(v = 0; v < A; v++)  // Loops through every rail in the array.
+        {
+            for(h = 0; h < length; h++) // Loops through every collumn in the array.
+            {
+                if (encryptedMessage2[v][h] != '\n' && encryptedMessage2[v][h] != '-')  // Sorting through the array so that no "-" or new lines will be printed, all other characters will be.
+                    printf("%c", encryptedMessage2[v][h]);  // Printing every other character reading in a top-bottom, left-right format.
             }
         }
-        return 0;
+        printf("\n\n"); // Adding new lines to make the printed contents look neat.
+        return 0;   // Ends the program.
     }
 }
